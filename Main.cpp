@@ -3,13 +3,13 @@
 #include "Parser.cpp"
 #include "Interpreter.cpp"
 using namespace std;
-#define DEBUG
+// #define DEBUG
 
 int main(int argc, char *argv[]){
     string pOption, ConcreteCode;
     FAE* fae;
     Parser parser;
-    interpreter interpreter;
+    Interpreter interpreter;
 
     #ifdef DEBUG 
     cout << "Let's start!\n";

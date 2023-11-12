@@ -84,7 +84,7 @@
         [(list '- l r)              (sub (parse l) (parse r))]
         [(list 'with (list i v) e)  (app (fun i (parse e)) (parse v))]
         [(? symbol?)                (id sexp)]
-        [(list 'fun (list p) b)                 (fun p (parse b))]
+        [(list 'fun (list p) b)     (fun p (parse b))]
         [(list f a)                 (app (parse f) (parse a))]
         [else                       (error 'parse "bad syntax: ~a" sexp)]))
 
@@ -117,3 +117,6 @@
 (test (interp (parse '(+ 10 10)) mtSub) (numV 20))
 (test (interp (parse '(- 10 2)) mtSub) (numV 8))
 (test (interp (parse 30) mtSub) (numV 30))
+(parse '(with (y 10) (+ y y)))
+(interp (parse '(with (y 10) (+ y y))) (mtSub))
+(parse '(1 2))

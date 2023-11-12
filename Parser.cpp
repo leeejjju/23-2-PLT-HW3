@@ -2,12 +2,11 @@
 #include <regex>
 #include <string>
 #include "FAE.h"
-#define DEBUG
+// #define DEBUG
 
 
 class Parser {
 public:
-    // Parser();
     vector<string> splitExpressionAsSubExpressions(string exampleCode);
     vector<string> getSubExpressions(string exampleCode);
     FAE* parse(string exampleCode);
@@ -20,9 +19,9 @@ vector<string> Parser::splitExpressionAsSubExpressions(string exampleCode){
         #ifdef DEBUG 
         cout << "[splitExpressionAsSubExpressions] not worked : " << exampleCode << endl;
         #endif
-        // exit(0);
-        
+        //exit(0);
     }
+
     if (exampleCode.front() == '{'){ //in the case { ~~~~ } ??
         exampleCode = exampleCode.substr(1, exampleCode.length() - 1);
         #ifdef DEBUG 
@@ -43,8 +42,8 @@ vector<string> Parser::getSubExpressions(string exampleCode) {
     for (int i = 0; i < exampleCode.length(); i++) {
 
         if (i == 0 || (i == 0 && exampleCode.at(i) == '{')) { 
-            strBuffer = strBuffer + exampleCode.at(i); //just push char in buffer
             if(exampleCode.at(i) == '{') openingParenthesisCount++;
+            strBuffer += exampleCode.at(i); //just push char in buffer
             continue;
 
         } else if (exampleCode.at(i) == ' ' && openingParenthesisCount == 0){
@@ -59,19 +58,19 @@ vector<string> Parser::getSubExpressions(string exampleCode) {
             if (exampleCode.at(i) == '{' && openingParenthesisCount == 0){
                 // new scope start with '{'
                 openingParenthesisCount++;
-                strBuffer = "" + exampleCode.at(i);
+                strBuffer += exampleCode.at(i);
                 continue;
 
             } else if (exampleCode.at(i) == '{'){
                 // add scope start with '{'
                 openingParenthesisCount++;
-                strBuffer = strBuffer + exampleCode.at(i);
+                strBuffer += exampleCode.at(i);
                 continue;
 
             } else if (exampleCode.at(i) == '}' && openingParenthesisCount > 0){
                 // closed one inner scope; just add to buffer
                 openingParenthesisCount--;
-                strBuffer = strBuffer + exampleCode.at(i);
+                strBuffer += exampleCode.at(i);
                 continue;
 
             } else if (exampleCode.at(i) == '}'){
@@ -83,20 +82,16 @@ vector<string> Parser::getSubExpressions(string exampleCode) {
             
         }
         //for another, simply add to buffer
-        strBuffer = strBuffer + exampleCode.at(i);
+        strBuffer += exampleCode.at(i);
 
     }
     //save the last buffer as sexpression
     if(strBuffer.size()) sexpressions.push_back(strBuffer);
-    #ifdef DEBUG
-    cout << "[getSubExpression] just made " << sexpressions.size() << " sub expression. \n";
-    for(int i = 0; i < sexpressions.size(); i++){
-        cout << i << "st expr: " << sexpressions.at(i) << endl;
-    }
-    #endif
+    
     //return the list of sexpressioin
     return sexpressions;
 }
+
 
 /*(define (parse sexp)
    (match sexp
@@ -114,22 +109,30 @@ FAE* Parser::parse(string exampleCode) {
     #endif
     vector<string> subExpressions = splitExpressionAsSubExpressions(exampleCode);
 
+    #ifdef DEBUG
+    cout << "[parse] just made " << subExpressions.size() << " sub expression. \n";
+    for(int i = 0; i < subExpressions.size(); i++){
+        cout << i << "st expr: \'" << subExpressions.at(i) << "\'\n";
+    }
+    
+    #endif
+
     if (subExpressions.size() == 1 && isNumeric(subExpressions.front())){
-        // FAE* num = new Num();
+        // num
         FAE *num = new FAE();
         num->type = NUM;
         num->createNum(subExpressions.front());
         return num;
 
-    }else if (subExpressions.front() == "+"){
-        // FAE* num = new Num();
+    }else if (subExpressions.front().compare("+") == 0){
+        // add
         FAE *add = new FAE();
         add->type = ADD;
         add->createAdd(parse(subExpressions.at(1)), parse(subExpressions.at(2)));
         return add;
 
     } else if (subExpressions.front() == "-"){
-        // FAE* num = new Num();
+        // sub
         FAE *sub = new FAE();
         sub->type = SUB;
         sub->createSub(parse(subExpressions.at(1)), parse(subExpressions.at(2)));
@@ -137,32 +140,39 @@ FAE* Parser::parse(string exampleCode) {
 
     } else if(subExpressions.front() == "with"){
         //[(list 'with (list i v) e)  (app (fun i (parse e)) (parse v))]  
-        // {with {x 3} {+ x x}} -> (app (fun x (add (id x) (id x))) (num 3))
+        //{with {x 3} {+ x x}} -> (app (fun x (add (id x) (id x))) (num 3))
         FAE* app = new FAE();
         app->type = APP;
 
         FAE* fun = new FAE();
         fun->type = FUN;
-        fun->createFun(parse(subExpressions.at(1))->fun_expr, parse(subExpressions.at(2)));
+        #ifdef DEBUG
+        cout << "WITH FUN: " << parse(subExpressions.at(1))->fun_expr->name << " : " << subExpressions.at(2) << endl;
+        #endif
+        fun->createFun((parse(subExpressions.at(1))->fun_expr->name), parse(subExpressions.at(2)));
+        
+        //cout << "[parse] in with, fun: " << fun->getFAECode() << endl;
         app->createApp(fun, parse(subExpressions.at(1))->arg_expr);
         return app;
 
     }else if(subExpressions.front() == "fun"){
-        //[(list 'fun (list p) b)                 (fun p (parse b))]
+        //fun
         FAE* fun = new FAE();
         fun->type = FUN;
         if(subExpressions.at(1).back() == '}') subExpressions.at(1)[subExpressions.at(1).size()-1] = 0;
-        fun->createFun(parse(subExpressions.at(1)), parse(subExpressions.at(2)));
+        fun->createFun((parse(subExpressions.at(1))->name), parse(subExpressions.at(2)));
         return fun;
 
     }else if (subExpressions.size() < 2 && !isNumeric(subExpressions.front())){
+        //id
         FAE* id = new FAE();
         id->type = ID;
         id->createID(subExpressions.front());
         return id;
 
-    }else if(subExpressions.size() >= 2 && !isNumeric(subExpressions.front())){
+    }else if(subExpressions.size() >= 2 ){ //&& !isNumeric(subExpressions.front())
         //[(list f a)                 (app (parse f) (parse a))]
+        //app
         FAE* app = new FAE();
         app->type = APP;
         app->createApp(parse(subExpressions.front()), parse(subExpressions.at(1)));

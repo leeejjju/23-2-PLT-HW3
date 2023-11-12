@@ -31,8 +31,9 @@ class FAE{
         FAE *rhs;
         string name;//for id
 
-        FAE* param;//for fun
+        string param;//for fun
         FAE* body;
+
         FAE* fun_expr;//for app
         FAE* arg_expr;
 
@@ -40,40 +41,10 @@ class FAE{
         void createAdd(FAE*, FAE*);
         void createSub(FAE*, FAE*);
         void createID(string);
-        void createFun(FAE*, FAE*);
+        void createFun(string, FAE*);
         void createApp(FAE*, FAE*);
 
-        FAE getLhs();
-        FAE getRhs();
-
         string getFAECode();
-};
-
-/*(define-type DefrdSub
-  [mtSub]
-  [aSub   (name symbol?) (value FAE-Value?) 
-          (ds DefrdSub?)])
-*/
-/*(define-type FAE-Value
-  [numV      (n number?)]
-  [closureV (param symbol?)
-                  (body FAE?)
-                  (ds DefrdSub?)])
-*/
-class FAE_Value{
-
-    public:
-        int type;
-        int numV;
-        FAE* param;
-        FAE* body;
-        vector<pair<string, FAE_Value*>> ds = {}; //defrdSub (list of pair of id, numV)
-
-        void createNumV(string);
-        void createClosureV(FAE*, FAE*, vector<pair<string, FAE_Value*>>);
-        string getFAEVCode();
-        string printDs(vector<pair<string, FAE_Value*>>);
-
 };
 
 //save num 
@@ -99,9 +70,8 @@ void FAE::createID(string stringSymbol) {
 }
 
 //save fun
-void FAE::createFun(FAE* input_param, FAE* input_body){
+void FAE::createFun(string input_param, FAE* input_body){
     param = input_param;
-    name = input_param->name;
     body = input_body;
 }
 
@@ -110,17 +80,6 @@ void FAE::createApp(FAE* input_fun_expr, FAE* input_arg_expr){
     fun_expr = input_fun_expr;
     arg_expr = input_arg_expr;
 }
-
-//get lhs
-FAE FAE::getLhs() {
-    return *lhs;
-}
-
-//get rhs
-FAE FAE::getRhs() {
-    return *rhs;
-}
-
 
 /*(define (parse sexp)
    (match sexp
@@ -174,7 +133,7 @@ string FAE::getFAECode() {
         case FUN:
         //[(list 'fun (list p) b)                 (fun p (parse b))]
         FAECode += funCode;
-        FAECode += param->name;
+        FAECode += param;
         FAECode += " ";
         FAECode += body->getFAECode();
         FAECode += ")";
@@ -196,16 +155,43 @@ string FAE::getFAECode() {
 }
 
 
+// ----------------------------------------------------
+/*(define-type DefrdSub
+  [mtSub]
+  [aSub   (name symbol?) (value FAE-Value?) 
+          (ds DefrdSub?)])
+*/
+/*(define-type FAE-Value
+  [numV      (n number?)]
+  [closureV (param symbol?)
+                  (body FAE?)
+                  (ds DefrdSub?)])
+*/
+class FAE_Value{
+    public:
+        int type;
 
+        int numV;
+        string param;
+        FAE* body;
+        vector<pair<string, FAE_Value*>> ds = {}; //defrdSub (list of pair of id, value)
 
+        void createNumV(string);
+        void createClosureV(string, FAE*, vector<pair<string, FAE_Value*>>);
+        string getFAEVCode();
+        string printDs(vector<pair<string, FAE_Value*>>);
+
+};
 
 //save numV
 void FAE_Value::createNumV(string inputNum){
+    type = NUMV;
     numV = stoi(inputNum);
 }
 
 // save closureV
-void FAE_Value::createClosureV(FAE* inputParam, FAE* inputBody, vector<pair<string, FAE_Value*>> inputDs){
+void FAE_Value::createClosureV(string inputParam, FAE* inputBody, vector<pair<string, FAE_Value*>> inputDs){
+    type = CLOSUREV;
     param = inputParam;
     body = inputBody;
     ds = inputDs;
@@ -224,8 +210,8 @@ string FAE_Value::getFAEVCode(){
     }
 
     if(type == CLOSUREV){
-        FAEVCode += numVCode;
-        FAEVCode += param->name;
+        FAEVCode += closureVCode;
+        FAEVCode += param;
         FAEVCode += " ";
         FAEVCode += body->getFAECode();
         FAEVCode += " ";
@@ -237,12 +223,14 @@ string FAE_Value::getFAEVCode(){
 }
 
 string FAE_Value::printDs(vector<pair<string, FAE_Value*>> dss){
+    
     if(dss.size() == 0){
-        cout << "(mtSub)";
+        return "(mtSub)";
     }else{
         vector<pair<string, FAE_Value*>> rest;
         rest.resize((int)(dss.size() -1));
         copy(dss.begin()+1, dss.end(), rest.begin());
-        cout << "(" << dss.front().first << dss.front().second << printDs(rest) << ")";
+        return "(aSub \'" + dss.front().first + " " + (dss.front().second)->getFAEVCode() + " " + printDs(rest) + ")";
     }
+
 }
