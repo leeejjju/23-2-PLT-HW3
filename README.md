@@ -1,12 +1,24 @@
 # HOW TO USE
 
-
+```
+ <RFAE> ::= <Number>
+        |  {+ <RFAE> <RFAE>}
+        |  {- <RFAE> <RFAE>}
+        |  {* <RFAE> <RFAE>}
+        |  {if <RFAE> <RFAE> <RFAE>}
+        |  {= <RFAE> <RFAE>}
+        |  {or <RFAE> <RFAE>}
+        |  <Id>
+        |  {with {<Id> <RFAE>} <RFAE>}
+        |  {fun <Id> <RFAE>}
+        |  {<RFAE> <RFAE>}
+```
 
 ### 1. unzip it
 
 unzip the zip file 
 
-
+<br>
 
 ### 2. compile  
 
@@ -14,7 +26,7 @@ unzip the zip file
 compile the cpp file with makefile 
 > $ make
 
-
+<br>
 
 ### 3. use 
 
