@@ -3,6 +3,9 @@
         "xstring": "cpp",
         "vector": "cpp",
         "regex": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "iostream": "cpp",
+        "utility": "cpp",
+        "ostream": "cpp"
     }
 }

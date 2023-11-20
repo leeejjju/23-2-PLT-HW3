@@ -4,7 +4,17 @@
 #include "RFAE.h"
 // #define DEBUG
 string E[16] = {"NULL", "NUM", "ADD", "SUB", "ID", "FUN", "APP", "NUMV", "CLOSUREV", "MULT", "IF", "OR", "EQUL"};
+/*
 
+{with {mk-rec {fun {body-proc} {with {fX {fun {fY} {with {f {fun {x} {{fY fY} x}}} {body-proc f}}}} {fX fX}}}} 
+{with {mk-rec {fun {body-proc} {with {fX {fun {fY} {with {f {fun {x} {{fY fY} x}}} {body-proc f}}}} {fX fX}}}}
+
+
+{with {fib {mk-rec {fun {fib} {fun {n} {if {or {= n 0} {= n 1}} 1 {+ {fib {- n 1}} {fib {- n 2}}}}}}}} {fib 10}}}
+{with {fib {mk-rec {fun {fib} {fun {n} {if {or {= n 0} {= n 1}} 1 {+ {fib {- n 1}} {fib {- n 2}}}}}}}} {fib 10}}}
+{with {fib {mk-rec {fun {fib} {fun {n} {if {or {= n 0} {= n 1}} 1 {+ {fib {- n 1}} {fib {- n 2}}}}}}}} {fib 10}}}
+
+*/
 
 class Interpreter{
     public:

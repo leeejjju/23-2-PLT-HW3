@@ -3,7 +3,7 @@
 #include "Parser_rfae.cpp"
 #include "Interpreter_rfae.cpp"
 using namespace std;
-// #define DEBUG
+#define DEBUG
 
 int main(int argc, char *argv[]){
     string pOption, ConcreteCode;
