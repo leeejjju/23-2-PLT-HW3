@@ -67,6 +67,7 @@ RFAE_Value Interpreter::interp(RFAE* RFAE, vector<pair<string, RFAE_Value*>> ds)
     return equlNumV(interp(RFAE->lhs, ds), interp(RFAE->rhs, ds));
     
     case ID:
+    cout << "[interp] find id from expr: " << RFAE->getRFAECode() << endl;
     return lookup(RFAE->name, ds);
     
     case FUN:
@@ -104,11 +105,12 @@ RFAE_Value Interpreter::interp(RFAE* RFAE, vector<pair<string, RFAE_Value*>> ds)
 // '(with (x (with (y 5) x)) y)
 RFAE_Value Interpreter::lookup(string id, vector<pair<string, RFAE_Value*>> dss){
 
+    
     #ifdef DEBUG
     cout << "num of ds: " << dss.size()<< endl;
     #endif
     for(auto it = dss.begin(); it < dss.end(); it++){
-        //cout << "[lookup] compair id " << (it->first).c_str() << " and " << id.c_str() << ": "<< strcmp((it->first).c_str(), id.c_str()) << endl;
+        cout << "[lookup] compair id " << (it->first).c_str() << " and " << id.c_str() << ": "<< strcmp((it->first).c_str(), id.c_str()) << endl;
         if (strcmp((it->first).c_str(), id.c_str()) == 0){
             return *(it->second);
         }
