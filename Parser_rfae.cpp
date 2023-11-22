@@ -14,6 +14,9 @@
 (app (fun mk-rec (app (fun fib (app (id fib) (num 10))) (app (id mk-rec) (fun fib (fun n (if (or (= (id n) (num 0)) (= (id n) (num 1))) (num 1) (add (app (id fib) (sub (id n) (num 1))) (app (id fib) (sub (id n) (num 2)))))))))) (fun body-proc (app (fun fX (app (id fX) (id fX))) (fun fY (app (fun f (app (id body-proc) (id f))) (fun x (app (app (id fY) (id fY)) (id x))))))))
 
 
+(app (fun mk-rec (app (fun fib (app (id fib) (num 10))) (app (id mk-rec) (fun fib (fun n (if (or (= (id n) (num 0)) (= (id n) (num 1))) (num 1) (add (app (id fib) (sub (id n) (num 1))) (app (id fib) (sub (id n) (num 2)))))))))) (fun body-proc (app (fun fX (app (id fX) (id fX))) (fun fY (app (fun f (app (id body-proc) (id f))) (fun x (app (app (id fY) (id fY)) (id x))))))))
+
+
 
 
 "{with {fac {fun {n} {if {= n 0} 1 {* n {fac {- n 1}}}}}} {fac 10}}"
